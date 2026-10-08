@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPTV Brasil - Player Completo</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body {
+            background: #0a0a0f;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .container { width: 100%; max-width: 1400px; }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 18px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        header h1 {
+            font-size: 2rem;
+            background: linear-gradient(90deg, #00d4ff, #7b2ff7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+        header p { color: #888; font-size: 0.85rem; }
+
+        .proxy-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: rgba(123,47,247,0.08);
+            border: 1px solid rgba(123,47,247,0.25);
+            border-radius: 12px;
+            align-items: center;
+        }
+        .proxy-bar label { font-size: 0.8rem; color: #b088ff; white-space: nowrap; }
+        .proxy-bar input {
+            flex: 1;
+            padding: 9px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.4);
+            color: #fff;
+            font-size: 0.8rem;
+            outline: none;
+        }
+        .proxy-bar input:focus { border-color: #7b2ff7; }
+
+        .layout { display: grid; grid-template-columns: 1fr 300px; gap: 18px; }
+        @media (max-width: 950px) { .layout { grid-template-columns: 1fr; } }
+
+        .video-wrap {
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .video-wrap video { width: 100%; height: 100%; display: block; }
+        .overlay {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            color: #555; gap: 12px; background: #000;
+        }
+        .overlay svg { width: 50px; height: 50px; opacity: 0.4; }
+
+        .panel {
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid rgba(255,255,255,0.08);
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .panel h2 { font-size: 0.95rem; color: #00d4ff; }
+        select, input[type="text"] {
+            width: 100%; padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.4);
+            color: #fff; font-size: 0.85rem; outline: none;
+        }
+        select:focus, input[type="text"]:focus { border-color: #00d4ff; }
+
+        .btn {
+            padding: 10px; border-radius: 10px; border: none;
+            font-weight: 600; cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            font-size: 0.85rem;
+        }
+        .btn-primary { background: linear-gradient(90deg, #00d4ff, #7b2ff7); color: #fff; }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-sec { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.15); }
+        .btn-sec:hover { background: rgba(255,255,255,0.15); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .status {
+            padding: 10px 12px; border-radius: 10px;
+            font-size: 0.78rem; display: flex; align-items: center; gap: 8px;
+            line-height: 1.3;
+        }
+        .status.ok { background: rgba(0,212,255,0.1); color: #00d4ff; border: 1px solid rgba(0,212,255,0.2); }
+        .status.err { background: rgba(255,60,60,0.1); color: #ff6b6b; border: 1px solid rgba(255,60,60,0.2); }
+        .status.warn { background: rgba(255,193,7,0.1); color: #ffc107; border: 1px solid rgba(255,193,7,0.2); }
+        .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; animation: pulse 1.5s infinite; flex-shrink: 0; }
+        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+
+        .search-box { position: relative; }
+        .search-box input { padding-left: 32px; }
+        .search-box::before {
+            content: "🔍"; position: absolute; left: 10px; top: 50%;
+            transform: translateY(-50%); font-size: 0.8rem; pointer-events: none;
+        }
+
+        .channels { margin-top: 20px; }
+        .channels h2 { font-size: 1.05rem; color: #00d4ff; margin-bottom: 12px; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .grid::-webkit-scrollbar { width: 8px; }
+        .grid::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); border-radius: 4px; }
+        .grid::-webkit-scrollbar-thumb { background: rgba(0,212,255,0.3); border-radius: 4px; }
+
+        .ch {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px; padding: 10px;
+            cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .ch:hover { background: rgba(0,212,255,0.08); border-color: rgba(0,212,255,0.3); }
+        .ch.active { background: rgba(0,212,255,0.12); border-color: #00d4ff; }
+        .ch .icon {
+            width: 36px; height: 36px; border-radius: 8px;
+            background: linear-gradient(135deg, #00d4ff, #7b2ff7);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.7rem; font-weight: bold; flex-shrink: 0;
+            overflow: hidden;
+        }
+        .ch .icon img { width: 100%; height: 100%; object-fit: contain; background: #111; }
+        .ch .info { flex: 1; min-width: 0; }
+        .ch .info .name { font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ch .info .cat { font-size: 0.68rem; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .empty { text-align: center; color: #555; padding: 30px; font-style: italic; grid-column: 1/-1; }
+
+        footer { margin-top: 30px; text-align: center; color: #444; font-size: 0.72rem; padding: 15px; }
+        footer a { color: #00d4ff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📺 IPTV Brasil</h1>
+            <p>Player funcional com proxy CORS integrado • Listas do iptv-org</p>
+        </header>
+
+        <div class="proxy-bar">
+            <label>🔧 URL do seu Cloudflare Worker:</label>
+            <input type="text" id="proxyInput" placeholder="https://iptv-proxy.SEU_USUARIO.workers.dev" />
+            <button class="btn btn-sec" id="saveProxyBtn" style="padding:9px 14px;">💾</button>
+        </div>
+
+        <div class="layout">
+            <div class="video-wrap" id="videoWrap">
+                <video id="video" controls playsinline></video>
+                <div class="overlay" id="overlay">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <p>Selecione um canal na lista</p>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>⚙️ Fonte de Canais</h2>
+                <select id="playlistSelect">
+                    <option value="https://iptv-org.github.io/iptv/countries/br.m3u">🇧🇷 Brasil (iptv-org)</option>
+                    <option value="https://iptv-org.github.io/iptv/index.m3u">🌍 Global (10.000+ canais)</option>
+                    <option value="https://iptv-org.github.io/iptv/categories/news.m3u">📰 Notícias</option>
+                    <option value="https://iptv-org.github.io/iptv/categories/sports.m3u">⚽ Esportes</option>
+                    <option value="https://iptv-org.github.io/iptv/categories/movies.m3u">🎬 Filmes</option>
+                    <option value="https://iptv-org.github.io/iptv/categories/music.m3u">🎵 Música</option>
+                </select>
+                <button class="btn btn-primary" id="loadBtn">🔄 Carregar Playlist</button>
+
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Filtrar canais..." />
+                </div>
+
+                <div class="status ok" id="status">
+                    <span class="dot"></span>
+                    <span id="statusText">Configure o proxy e clique em Carregar.</span>
+                </div>
+
+                <button class="btn btn-sec" id="stopBtn">⏹️ Parar Reprodução</button>
+            </div>
+        </div>
+
+        <div class="channels">
+            <h2 id="chTitle">📋 Canais (0)</h2>
+            <div class="grid" id="channelGrid">
+                <div class="empty">Carregue uma playlist para ver os canais disponíveis.</div>
+            </div>
+        </div>
+
+        <footer>
+            <p>⚠️ Player genérico. Use apenas com streams que você tem direito de acessar.</p>
+            <p>Listas por <a href="https://github.com/iptv-org/iptv" target="_blank">iptv-org</a> • Proxy CORS via Cloudflare Workers</p>
+        </footer>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const overlay = document.getElementById('overlay');
+        const channelGrid = document.getElementById('channelGrid');
+        const statusBar = document.getElementById('status');
+        const statusText = document.getElementById('statusText');
+        const playlistSelect = document.getElementById('playlistSelect');
+        const loadBtn = document.getElementById('loadBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const chTitle = document.getElementById('chTitle');
+        const proxyInput = document.getElementById('proxyInput');
+        const saveProxyBtn = document.getElementById('saveProxyBtn');
+        const searchInput = document.getElementById('searchInput');
+
+        let hls = null;
+        let allChannels = [];
+        let channels = [];
+        let currentIndex = -1;
+
+        let PROXY_URL = localStorage.getItem('iptv_proxy') || '';
+        proxyInput.value = PROXY_URL;
+
+        function setStatus(msg, type = 'ok') {
+            statusBar.className = 'status ' + type;
+            statusText.textContent = msg;
+        }
+
+        function getInitials(name) {
+            if (!name) return '?';
+            const w = name.trim().split(/\s+/);
+            return w.length === 1 ? w[0].substring(0,2).toUpperCase() : (w[0][0] + w[1][0]).toUpperCase();
+        }
+
+        function proxify(url) {
+            if (!PROXY_URL) return url;
+            const base = PROXY_URL.replace(/\/+$/, '');
+            return `${base}/?url=${encodeURIComponent(url)}`;
+        }
+
+        function parseM3U(text) {
+            const lines = text.split('\n');
+            const result = [];
+            let current = null;
+
+            for (let line of lines) {
+                line = line.trim();
+                if (line.startsWith('#EXTINF:')) {
+                    const nameMatch = line.match(/,(.+)$/);
+                    const groupMatch = line.match(/group-title="([^"]*)"/);
+                    const logoMatch = line.match(/tvg-logo="([^"]*)"/);
+                    current = {
+                        name: nameMatch ? nameMatch[1].trim() : 'Desconhecido',
+                        group: groupMatch ? groupMatch[1] : 'Geral',
+                        logo: logoMatch ? logoMatch[1] : ''
+                    };
+                } else if (line && !line.startsWith('#') && current) {
+                    current.url = line;
+                    result.push(current);
+                    current = null;
+                }
+            }
+            return result;
+        }
+
+        function stopPlayback() {
+            if (hls) { hls.destroy(); hls = null; }
+            video.pause();
+            video.removeAttribute('src');
+            video.load();
+            overlay.style.display = 'flex';
+            currentIndex = -1;
+            document.querySelectorAll('.ch').forEach(el => el.classList.remove('active'));
+        }
+
+        function playChannel(index) {
+            if (index < 0 || index >= channels.length) return;
+            const ch = channels[index];
+            currentIndex = index;
+            stopPlayback();
+            overlay.style.display = 'none';
+            setStatus(`Carregando "${ch.name}"...`);
+
+            if (!PROXY_URL) {
+                setStatus('⚠️ Proxy não configurado. Muitos canais serão bloqueados.', 'warn');
+            }
+
+            const streamUrl = proxify(ch.url);
+            const isHls = ch.url.includes('.m3u8') || ch.url.includes('m3u8');
+
+            if (isHls && Hls.isSupported()) {
+                hls = new Hls({
+                    enableWorker: true,
+                    lowLatencyMode: true,
+                    manifestLoadingTimeOut: 15000,
+                    manifestLoadingMaxRetry: 2,
+                    fragLoadingTimeOut: 20000,
+                });
+                hls.loadSource(streamUrl);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    video.play()
+                        .then(() => setStatus(`Reproduzindo: ${ch.name}`))
+                        .catch(() => setStatus('Clique em Play para iniciar (autoplay bloqueado).', 'warn'));
+                });
+                hls.on(Hls.Events.ERROR, (e, d) => {
+                    if (d.fatal) {
+                        setStatus(`Erro no stream "${ch.name}". Tente outro canal.`, 'err');
+                        overlay.style.display = 'flex';
+                    }
+                });
+            } else {
+                video.src = streamUrl;
+                video.load();
+                video.play()
+                    .then(() => setStatus(`Reproduzindo: ${ch.name}`))
+                    .catch(() => setStatus('Clique em Play para iniciar (autoplay bloqueado).', 'warn'));
+                video.onerror = () => {
+                    setStatus(`Erro ao carregar "${ch.name}". URL bloqueada ou inválida.`, 'err');
+                    overlay.style.display = 'flex';
+                };
+            }
+
+            document.querySelectorAll('.ch').forEach((el, i) => {
+                el.classList.toggle('active', i === index);
+            });
+        }
+
+        function renderChannels() {
+            chTitle.textContent = `📋 Canais (${channels.length}${allChannels.length !== channels.length ? ' de ' + allChannels.length : ''})`;
+
+            if (channels.length === 0) {
+                channelGrid.innerHTML = '<div class="empty">Nenhum canal encontrado.</div>';
+                return;
+            }
+
+            channelGrid.innerHTML = '';
+            channels.forEach((ch, i) => {
+                const div = document.createElement('div');
+                div.className = 'ch' + (i === currentIndex ? ' active' : '');
+                const iconContent = ch.logo
+                    ? `<img src="${ch.logo}" onerror="this.parentElement.textContent='${getInitials(ch.name)}'" alt="">`
+                    : getInitials(ch.name);
+                div.innerHTML = `
+                    <div class="icon">${iconContent}</div>
+                    <div class="info">
+                        <div class="name">${escapeHtml(ch.name)}</div>
+                        <div class="cat">${escapeHtml(ch.group)}</div>
+                    </div>
+                `;
+                div.addEventListener('click', () => playChannel(i));
+                channelGrid.appendChild(div);
+            });
+        }
+
+        function escapeHtml(text) {
+            const d = document.createElement('div');
+            d.textContent = text || '';
+            return d.innerHTML;
+        }
+
+        loadBtn.addEventListener('click', async () => {
+            const url = playlistSelect.value;
+            loadBtn.disabled = true;
+            setStatus('Carregando playlist...');
+            channelGrid.innerHTML = '<div class="empty">⏳ Carregando...</div>';
+
+            try {
+                const fetchUrl = PROXY_URL ? proxify(url) : url;
+                const resp = await fetch(fetchUrl);
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+                const text = await resp.text();
+
+                if (text.trim().startsWith('<')) {
+                    throw new Error('Resposta não é M3U (bloqueio CORS?)');
+                }
+
+                allChannels = parseM3U(text);
+
+                if (allChannels.length === 0) {
+                    setStatus('Playlist vazia ou formato não reconhecido.', 'err');
+                    channelGrid.innerHTML = '<div class="empty">Nenhum canal encontrado.</div>';
+                    return;
+                }
+
+                channels = [...allChannels];
+                searchInput.value = '';
+                setStatus(`${channels.length} canais carregados!`);
+                renderChannels();
+
+            } catch (err) {
+                console.error(err);
+                setStatus('Erro ao carregar playlist. Configure o proxy CORS.', 'err');
+                channelGrid.innerHTML = '<div class="empty">❌ Falha ao carregar. Verifique a URL do Worker e tente de novo.</div>';
+            } finally {
+                loadBtn.disabled = false;
+            }
+        });
+
+        searchInput.addEventListener('input', () => {
+            const q = searchInput.value.toLowerCase().trim();
+            if (!q) {
+                channels = [...allChannels];
+            } else {
+                channels = allChannels.filter(ch =>
+                    ch.name.toLowerCase().includes(q) ||
+                    ch.group.toLowerCase().includes(q)
+                );
+            }
+            renderChannels();
+        });
+
+        saveProxyBtn.addEventListener('click', () => {
+            const val = proxyInput.value.trim();
+            PROXY_URL = val;
+            localStorage.setItem('iptv_proxy', val);
+            setStatus(val ? '✅ Proxy salvo! Agora carregue uma playlist.' : '⚠️ Proxy removido.', val ? 'ok' : 'warn');
+        });
+
+        stopBtn.addEventListener('click', () => {
+            stopPlayback();
+            setStatus('Reprodução parada.');
+        });
+
+        window.addEventListener('load', () => {
+            if (PROXY_URL) {
+                setStatus('Proxy carregado. Clique em "Carregar Playlist".', 'ok');
+                setTimeout(() => loadBtn.click(), 300);
+            } else {
+                setStatus('⚠️ Cole a URL do seu Worker acima e clique em 💾.', 'warn');
+            }
+        });
+    </script>
+</body>
+</html>
