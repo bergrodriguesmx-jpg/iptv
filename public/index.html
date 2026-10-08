@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>IPTV Flix</title>
+<title>IPTV Brasil</title>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Helvetica Neue',Arial,sans-serif}
@@ -12,15 +12,12 @@ body{background:var(--bg);color:#fff;min-height:100vh;overflow-x:hidden}
 .navbar{position:fixed;top:0;left:0;right:0;height:68px;padding:0 60px;display:flex;align-items:center;gap:40px;z-index:1000;background:linear-gradient(180deg,rgba(0,0,0,.7) 10%,transparent 100%);transition:background .4s}
 .navbar.scrolled{background:var(--bg);box-shadow:0 2px 10px rgba(0,0,0,.5)}
 .logo{font-size:2rem;font-weight:900;color:var(--red);letter-spacing:2px;text-transform:uppercase}
-.nav-menu{display:flex;gap:22px;font-size:.9rem;color:#e5e5e5}
-.nav-menu span{cursor:pointer}
-.nav-menu span.active{color:#fff;font-weight:500}
 .nav-right{margin-left:auto;display:flex;align-items:center;gap:20px}
 .search-wrap input{width:0;opacity:0;padding:6px 8px;background:rgba(0,0,0,.85);border:1px solid rgba(255,255,255,.4);color:#fff;font-size:.85rem;outline:none;transition:all .3s;border-radius:2px}
 .search-wrap.open input{width:240px;opacity:1}
 .search-icon{cursor:pointer;font-size:1.1rem;padding:8px}
 .avatar{width:32px;height:32px;border-radius:4px;background:linear-gradient(135deg,#e50914,#831010);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem}
-.hero{position:relative;height:92vh;min-height:620px;background:#000;overflow:hidden;margin-bottom:-180px}
+.hero{position:relative;height:80vh;min-height:550px;background:#000;overflow:hidden;margin-bottom:-140px}
 .hero video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;background:#000}
 .hero-backdrop{position:absolute;inset:0;background:radial-gradient(circle at 75% 40%,rgba(229,9,20,.35),transparent 55%),radial-gradient(circle at 20% 60%,rgba(123,47,247,.3),transparent 55%),linear-gradient(135deg,#1a0000 0%,#0a0a0a 60%,#000 100%);display:flex;align-items:center;justify-content:center}
 .hero-backdrop-icon{font-size:8rem;opacity:.08}
@@ -31,7 +28,7 @@ body{background:var(--bg);color:#fff;min-height:100vh;overflow-x:hidden}
 .live-dot{display:inline-flex;align-items:center;gap:6px;background:var(--red);color:#fff;padding:3px 10px;font-size:.7rem;font-weight:700;letter-spacing:1px;border-radius:2px}
 .live-dot::before{content:'';width:6px;height:6px;background:#fff;border-radius:50%;animation:blink 1.4s infinite}
 @keyframes blink{50%{opacity:.3}}
-.hero-title{font-size:4.2rem;font-weight:900;line-height:1;letter-spacing:-2px;margin-bottom:20px;text-shadow:2px 4px 16px rgba(0,0,0,.9);text-transform:uppercase}
+.hero-title{font-size:4rem;font-weight:900;line-height:1;letter-spacing:-2px;margin-bottom:20px;text-shadow:2px 4px 16px rgba(0,0,0,.9);text-transform:uppercase}
 .hero-meta{display:flex;align-items:center;gap:14px;margin-bottom:16px;font-size:.9rem;color:#e5e5e5}
 .match{color:#46d369;font-weight:700}
 .hero-tag{border:1px solid rgba(255,255,255,.4);padding:1px 7px;font-size:.72rem;border-radius:2px}
@@ -40,56 +37,50 @@ body{background:var(--bg);color:#fff;min-height:100vh;overflow-x:hidden}
 .btn-hero{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:12px 30px;border:none;border-radius:4px;font-size:1.05rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
 .btn-hero.play{background:#fff;color:#000}
 .btn-hero.play:hover{background:rgba(255,255,255,.8)}
-.btn-hero.info{background:rgba(109,109,110,.7);color:#fff}
-.btn-hero.info:hover{background:rgba(109,109,110,.5)}
 .btn-hero.icon{width:44px;height:44px;border-radius:50%;padding:0;background:rgba(42,42,42,.7);border:2px solid rgba(255,255,255,.7)}
-.cat-bar{margin:0 60px 40px;display:flex;gap:8px;flex-wrap:wrap;position:relative;z-index:100}
-.cat-btn{padding:8px 18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#e5e5e5;border-radius:20px;cursor:pointer;font-size:.8rem;font-weight:500;transition:all .25s;white-space:nowrap;font-family:inherit}
-.cat-btn:hover{background:rgba(255,255,255,.15);color:#fff}
-.cat-btn.active{background:var(--red);border-color:var(--red);color:#fff;font-weight:700}
+.tabs-bar{margin:0 60px 30px;display:flex;gap:8px;flex-wrap:wrap;position:relative;z-index:100}
+.tab-btn{padding:10px 22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#b3b3b3;border-radius:4px;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .25s;font-family:inherit}
+.tab-btn:hover{background:rgba(255,255,255,.12);color:#fff}
+.tab-btn.active{background:#fff;color:#000;border-color:#fff}
 .row{position:relative;margin-bottom:42px;z-index:5}
 .row-header{padding:0 60px 10px}
-.row-title{font-size:1.4rem;font-weight:700;color:#e5e5e5}
+.row-title{font-size:1.3rem;font-weight:700;color:#e5e5e5}
 .row-scroll-wrap{position:relative;padding:0 60px;margin:0 -60px}
 .row-scroll{display:flex;gap:6px;overflow-x:auto;scroll-behavior:smooth;padding:30px 60px;margin:-30px 0;scrollbar-width:none}
 .row-scroll::-webkit-scrollbar{display:none}
-.card{flex:0 0 auto;width:260px;cursor:pointer;border-radius:4px;overflow:hidden;background:var(--card);transition:transform .3s,box-shadow .3s;position:relative}
-.card:hover{transform:scale(1.32) translateY(-12px);z-index:50;box-shadow:0 20px 50px rgba(0,0,0,.9)}
+.card{flex:0 0 auto;width:240px;cursor:pointer;border-radius:4px;overflow:hidden;background:var(--card);transition:transform .3s,box-shadow .3s;position:relative}
+.card:hover{transform:scale(1.3) translateY(-10px);z-index:50;box-shadow:0 20px 50px rgba(0,0,0,.9)}
 .card-thumb{width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,#1e1e1e,#2a2a2a);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.card-thumb img{width:100%;height:100%;object-fit:contain;padding:22px}
-.card-initials{font-size:2.6rem;font-weight:900;color:rgba(255,255,255,.12);letter-spacing:3px;font-family:'Arial Black',sans-serif}
+.card-thumb img{width:100%;height:100%;object-fit:contain;padding:20px}
+.card-initials{font-size:2.4rem;font-weight:900;color:rgba(255,255,255,.12);letter-spacing:3px;font-family:'Arial Black',sans-serif}
 .card-live{position:absolute;top:8px;left:8px;background:var(--red);color:#fff;font-size:.6rem;font-weight:800;padding:2px 6px;border-radius:2px;letter-spacing:.8px;z-index:3}
 .card-loading{position:absolute;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:5}
 .card-loading.show{display:flex}
-.card-loading::after{content:'';width:32px;height:32px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
+.card-loading::after{content:'';width:30px;height:30px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .card-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.1) 0%,rgba(0,0,0,.85) 100%);display:flex;align-items:flex-end;justify-content:center;padding-bottom:20px;opacity:0;transition:opacity .3s;z-index:2}
 .card:hover .card-overlay{opacity:1}
-.card-play-btn{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.95);color:#000;display:flex;align-items:center;justify-content:center;font-size:1.4rem;padding-left:4px;box-shadow:0 6px 20px rgba(0,0,0,.6)}
-.scroll-btn{position:absolute;top:30px;bottom:30px;width:55px;background:rgba(20,20,20,.75);border:none;color:#fff;cursor:pointer;font-size:2rem;z-index:20;opacity:0;transition:opacity .25s;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+.card-play-btn{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.95);color:#000;display:flex;align-items:center;justify-content:center;font-size:1.3rem;padding-left:4px;box-shadow:0 6px 20px rgba(0,0,0,.6)}
+.scroll-btn{position:absolute;top:30px;bottom:30px;width:50px;background:rgba(20,20,20,.75);border:none;color:#fff;cursor:pointer;font-size:2rem;z-index:20;opacity:0;transition:opacity .25s;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
 .row-scroll-wrap:hover .scroll-btn{opacity:1}
 .scroll-btn:hover{background:rgba(20,20,20,.95)}
 .scroll-left{left:0}
 .scroll-right{right:0}
-.loader{display:flex;justify-content:center;padding:80px 0}
-.loader::after{content:'';width:46px;height:46px;border:3px solid rgba(229,9,20,.2);border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
 .empty{text-align:center;padding:80px 20px;color:#737373}
 .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);padding:12px 26px;border-radius:4px;font-size:.85rem;font-weight:600;z-index:3000;transition:all .3s;opacity:0;pointer-events:none;box-shadow:0 12px 32px rgba(0,0,0,.7);max-width:90%}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.ok{background:#1e8449;color:#fff}
 .toast.err{background:var(--red);color:#fff}
 .toast.warn{background:#b7950b;color:#fff}
-@media(max-width:900px){.navbar{padding:0 20px}.nav-menu{display:none}.hero-content{left:20px;max-width:70%}.hero-title{font-size:2.4rem}.cat-bar{margin-left:20px;margin-right:20px}.row-header{padding-left:20px;padding-right:20px}.row-scroll-wrap{padding-left:20px;padding-right:20px;margin-left:-20px;margin-right:-20px}.row-scroll{padding-left:20px;padding-right:20px}.card{width:180px}.scroll-btn{display:none}}
+@media(max-width:900px){.navbar{padding:0 20px}.tabs-bar{margin-left:20px;margin-right:20px}.row-header{padding-left:20px;padding-right:20px}.row-scroll-wrap{padding-left:20px;padding-right:20px;margin-left:-20px;margin-right:-20px}.row-scroll{padding-left:20px;padding-right:20px}.card{width:180px}.scroll-btn{display:none}}
 </style>
 </head>
 <body>
 
 <nav class="navbar" id="navbar">
-<div class="logo">IPTV FLIX</div>
-<div class="nav-menu"><span class="active">Início</span><span>Canais</span><span>Filmes</span><span>Notícias</span></div>
+<div class="logo">IPTV BRASIL</div>
 <div class="nav-right">
-<div class="search-wrap" id="searchWrap"><input type="text" id="searchInput" placeholder="Buscar..."></div>
+<div class="search-wrap" id="searchWrap"><input type="text" id="searchInput" placeholder="Buscar canais..."></div>
 <span class="search-icon" id="searchToggle">🔍</span>
 <div class="avatar">B</div>
 </div>
@@ -103,8 +94,8 @@ body{background:var(--bg);color:#fff;min-height:100vh;overflow-x:hidden}
 <div class="hero-content">
 <div class="hero-badge-row"><span class="live-dot">AO VIVO</span><span id="heroGroup">Selecione um canal</span></div>
 <h1 class="hero-title" id="heroTitle">BEM-VINDO</h1>
-<div class="hero-meta"><span class="match">98% relevante</span><span>2024</span><span class="hero-tag">HD</span><span class="hero-tag">L</span></div>
-<p class="hero-desc" id="heroDesc">Canais verificados e prontos para assistir. Clique em qualquer um abaixo.</p>
+<div class="hero-meta"><span class="match">98% relevante</span><span>Brasil</span><span class="hero-tag">HD</span><span class="hero-tag">L</span></div>
+<p class="hero-desc" id="heroDesc">Canais brasileiros verificados. Escolha uma aba abaixo para filtrar.</p>
 <div class="hero-actions">
 <button class="btn-hero play" id="btnPlayHero">▶ Reproduzir</button>
 <button class="btn-hero icon" id="btnStopHero" title="Parar">⏹</button>
@@ -112,11 +103,15 @@ body{background:var(--bg);color:#fff;min-height:100vh;overflow-x:hidden}
 </div>
 </section>
 
-<div class="cat-bar" id="catBar">
-<button class="cat-btn active" onclick="loadPlaylist('verificada',this)">✅ Canais Verificados</button>
-<button class="cat-btn" onclick="loadPlaylist('https://iptv-org.github.io/iptv/categories/news.m3u',this)">📰 Notícias</button>
-<button class="cat-btn" onclick="loadPlaylist('https://iptv-org.github.io/iptv/categories/sports.m3u',this)">⚽ Esportes</button>
-<button class="cat-btn" onclick="loadPlaylist('https://iptv-org.github.io/iptv/categories/movies.m3u',this)">🎬 Filmes</button>
+<div class="tabs-bar" id="tabsBar">
+<button class="tab-btn active" onclick="switchTab('todos',this)">📺 Todos</button>
+<button class="tab-btn" onclick="switchTab('Ao Vivo',this)">🔴 Ao Vivo</button>
+<button class="tab-btn" onclick="switchTab('Filmes',this)">🎬 Filmes</button>
+<button class="tab-btn" onclick="switchTab('Séries',this)">📽️ Séries</button>
+<button class="tab-btn" onclick="switchTab('Notícias',this)">📰 Notícias</button>
+<button class="tab-btn" onclick="switchTab('Esportes',this)">⚽ Esportes</button>
+<button class="tab-btn" onclick="switchTab('Infantil',this)">👶 Infantil</button>
+<button class="tab-btn" onclick="switchTab('Documentários',this)">🎥 Docs</button>
 </div>
 
 <div id="content"><div class="empty">Carregando...</div></div>
@@ -124,60 +119,77 @@ body{background:var(--bg);color:#fff;min-height:100vh;overflow-x:hidden}
 <div class="toast" id="toast"><span id="toastText">Pronto</span></div>
 
 <script>
-var hls=null, allChannels=[], channels=[], currentIndex=-1, loadTimer=null;
+// ============================================
+// LISTA CURADA — canais brasileiros públicos
+// ============================================
+var CURATED = [
+  // === AO VIVO ===
+  {name:"TV Brasil", group:"Ao Vivo", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/TV_Brasil_logo_2019.png/200px-TV_Brasil_logo_2019.png", url:"https://tvbrasil-stream.ebc.com.br/index.m3u8"},
+  {name:"TV Câmara", group:"Ao Vivo", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/TV_C%C3%A2mara_logo.png/200px-TV_C%C3%A2mara_logo.png", url:"https://stream3.camara.gov.br/tv1/manifest.m3u8"},
+  {name:"TV Senado", group:"Ao Vivo", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/TV_Senado_logo.png/200px-TV_Senado_logo.png", url:"https://stream1.freetv.fun/tv-senado-1.m3u8"},
+  {name:"Canal Gov", group:"Ao Vivo", logo:"", url:"https://canalgov-stream.ebc.com.br/index.m3u8"},
+  {name:"Canal Saúde", group:"Ao Vivo", logo:"", url:"https://canalsaude-stream.ebc.com.br/index.m3u8"},
+  {name:"TV Justiça", group:"Ao Vivo", logo:"", url:"https://stream3.stf.jus.br/tvjustica/index.m3u8"},
+  {name:"Rede Brasil", group:"Ao Vivo", logo:"", url:"https://redebrasil.nuuvemplay.live/hls/stream.m3u8"},
+
+  // === FILMES ===
+  {name:"CineMonde", group:"Filmes", logo:"https://i.imgur.com/dpat1CH.png", url:"https://video01.soultv.com.br/cinemonde/cinemonde/playlist.m3u8"},
+  {name:"MovieSphere", group:"Filmes", logo:"", url:"https://stream.ads.ottera.tv/playlist.m3u8"},
+  {name:"Pluto TV Filmes Ação", group:"Filmes", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Pluto_TV_logo_2020.svg/200px-Pluto_TV_logo_2020.svg.png", url:"https://service-stitcher.clusters.pluto.tv/v1/stitch/embed/hls/channel/5f12101f0b12f00007844c7c/master.m3u8?deviceId=test"},
+  {name:"Pluto TV Cine Sucessos", group:"Filmes", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Pluto_TV_logo_2020.svg/200px-Pluto_TV_logo_2020.svg.png", url:"https://service-stitcher.clusters.pluto.tv/v1/stitch/embed/hls/channel/5f5a545d0dbf7f0007c09408/master.m3u8?deviceId=test"},
+  {name:"Pluto TV Filmes Nacionais", group:"Filmes", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Pluto_TV_logo_2020.svg/200px-Pluto_TV_logo_2020.svg.png", url:"https://service-stitcher.clusters.pluto.tv/v1/stitch/embed/hls/channel/5f5a545d0dbf7f0007c09408/master.m3u8?deviceId=test"},
+
+  // === SÉRIES ===
+  {name:"Pluto TV Séries", group:"Séries", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Pluto_TV_logo_2020.svg/200px-Pluto_TV_logo_2020.svg.png", url:"https://r.mjh.nz/PlutoTV/5f121262a189a800076b9386-alt.m3u8"},
+  {name:"Pluto TV Cine Sucessos", group:"Séries", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Pluto_TV_logo_2020.svg/200px-Pluto_TV_logo_2020.svg.png", url:"https://service-stitcher.clusters.pluto.tv/v1/stitch/embed/hls/channel/5f5a545d0dbf7f0007c09408/master.m3u8?deviceId=test"},
+
+  // === NOTÍCIAS ===
+  {name:"CNN Brasil", group:"Notícias", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/CNN_Brasil_logo.png/200px-CNN_Brasil_logo.png", url:""},
+  {name:"Band News", group:"Notícias", logo:"", url:""},
+  {name:"TV Brasil Internacional", group:"Notícias", logo:"", url:"https://tvbrasilinternacional-stream.ebc.com.br/index.m3u8"},
+
+  // === ESPORTES ===
+  {name:"ESPN Brasil", group:"Esportes", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/ESPN_wordmark.svg/200px-ESPN_wordmark.svg.png", url:""},
+  {name:"FIFA+", group:"Esportes", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/FIFA_logo_without_slogan.svg/200px-FIFA_logo_without_slogan.svg.png", url:"https://fifaplus-samsungau.amagi.tv/playlist.m3u8"},
+
+  // === INFANTIL ===
+  {name:"Pluto TV Kids", group:"Infantil", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Pluto_TV_logo_2020.svg/200px-Pluto_TV_logo_2020.svg.png", url:"https://service-stitcher.clusters.pluto.tv/v1/stitch/embed/hls/channel/5f1213e5a0b8a30007b2c8b2/master.m3u8?deviceId=test"},
+  {name:"BabyFirst", group:"Infantil", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/BabyFirst_logo.png/200px-BabyFirst_logo.png", url:"https://babyfirst-babyfirst-1-us.plex.wurl.tv/playlist.m3u8"},
+
+  // === DOCUMENTÁRIOS ===
+  {name:"NASA TV", group:"Documentários", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/NASA_logo.svg/200px-NASA_logo.svg.png", url:"https://ntv1.akamaized.net/hls/live/2014075/NASA-NTV1-HLS/master.m3u8"},
+  {name:"DW English", group:"Documentários", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Deutsche_Welle_symbol_2012.svg/200px-Deutsche_Welle_symbol_2012.svg.png", url:"https://dwamdstream102.akamaized.net/hls/live/2015525/dwstream102/index.m3u8"},
+  {name:"France 24 English", group:"Documentários", logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/France24.png/200px-France24.png", url:"https://static.france24.com/live/F24_EN_LO_HLS/live_web.m3u8"}
+];
+
+var hls=null, allChannels=[], channels=[], currentIndex=-1, loadTimer=null, currentTab='todos';
 
 function showToast(m,t){t=t||'ok';var el=document.getElementById('toast');document.getElementById('toastText').textContent=m;el.className='toast '+t+' show';clearTimeout(window._tt);window._tt=setTimeout(function(){el.classList.remove('show');},3500);}
 function getInitials(n){if(!n)return'?';var w=n.trim().split(/\s+/);return w.length===1?w[0].substring(0,2).toUpperCase():(w[0][0]+w[1][0]).toUpperCase();}
 function escapeHtml(t){var d=document.createElement('div');d.textContent=t||'';return d.innerHTML;}
 
-function parseM3U(text){
-  var lines=text.split('\n'),out=[],cur=null;
-  for(var i=0;i<lines.length;i++){
-    var line=lines[i].trim();
-    if(line.startsWith('#EXTINF:')){
-      var n=line.match(/,(.+)$/),g=line.match(/group-title="([^"]*)"/),l=line.match(/tvg-logo="([^"]*)"/);
-      cur={name:n?n[1].trim():'Sem nome',group:g?g[1]:'Geral',logo:l?l[1]:''};
-    } else if(line&&!line.startsWith('#')&&cur){
-      cur.url=line;out.push(cur);cur=null;
-    }
-  }
-  return out;
+function switchTab(tab,btn){
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  if(btn) btn.classList.add('active');
+  filterAndRender();
 }
 
-async function loadPlaylist(url,btn){
-  if(btn){document.querySelectorAll('.cat-btn').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');}
-  var c=document.getElementById('content');
-
-  // Lista verificada (world_ip_tv)
-  if(url==='verificada'){
-    url = 'https://romaxa55.github.io/world_ip_tv/output/index.m3u';
-  }
-
-  c.innerHTML='<div class="empty">⏳ Carregando lista verificada...</div>';
-  showToast('Buscando canais verificados...','warn');
-
-  try{
-    var controller = new AbortController();
-    var tid = setTimeout(function(){controller.abort();}, 25000);
-    var r = await fetch('/proxy?url='+encodeURIComponent(url), {signal: controller.signal});
-    clearTimeout(tid);
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    var txt = await r.text();
-    if(txt.trim().startsWith('<')) throw new Error('Não é M3U');
-    allChannels = parseM3U(txt);
-    if(!allChannels.length){c.innerHTML='<div class="empty">Nenhum canal encontrado</div>';return;}
+function filterAndRender(){
+  if(currentTab === 'todos'){
     channels = allChannels.slice();
-    renderRows();
-    showToast(allChannels.length+' canais verificados 🎬','ok');
-  }catch(e){
-    console.error(e);
-    c.innerHTML='<div class="empty">❌ Falha ao carregar. Tente novamente.</div>';
-    showToast(e.name==='AbortError'?'Timeout — lista muito grande':'Erro ao carregar','err');
+  } else {
+    channels = allChannels.filter(function(c){ return c.group === currentTab; });
   }
+  renderRows();
 }
 
 function renderRows(){
   var c=document.getElementById('content');c.innerHTML='';
+  if(channels.length === 0){
+    c.innerHTML='<div class="empty">Nenhum canal nesta categoria.</div>';
+    return;
+  }
   var groups={};
   channels.forEach(function(ch,i){
     var g=ch.group||'Outros';
@@ -206,7 +218,7 @@ function buildRow(title,items){
 }
 
 function buildCard(ch,idx){
-  var card=document.createElement('div');card.className='card';card.dataset.idx=idx;
+  var card=document.createElement('div');card.className='card';
   card.onclick=function(){playChannel(idx);};
   var thumb=document.createElement('div');thumb.className='card-thumb';
   if(ch.logo){
@@ -216,7 +228,9 @@ function buildCard(ch,idx){
   }else{
     var i=document.createElement('div');i.className='card-initials';i.textContent=getInitials(ch.name);thumb.appendChild(i);
   }
-  var live=document.createElement('div');live.className='card-live';live.textContent='AO VIVO';thumb.appendChild(live);
+  if(ch.group==='Ao Vivo'){
+    var live=document.createElement('div');live.className='card-live';live.textContent='AO VIVO';thumb.appendChild(live);
+  }
   var loading=document.createElement('div');loading.className='card-loading';loading.dataset.loading=idx;thumb.appendChild(loading);
   var ov=document.createElement('div');ov.className='card-overlay';
   var pb=document.createElement('div');pb.className='card-play-btn';pb.textContent='▶';
@@ -239,7 +253,7 @@ function stopPlayback(){
   v.pause();v.removeAttribute('src');v.load();v.style.display='none';
   document.getElementById('heroBackdrop').style.display='flex';
   document.getElementById('heroTitle').textContent='BEM-VINDO';
-  document.getElementById('heroDesc').textContent='Canais verificados e prontos para assistir.';
+  document.getElementById('heroDesc').textContent='Canais brasileiros verificados. Escolha uma aba abaixo para filtrar.';
   document.getElementById('heroGroup').textContent='Selecione um canal';
   document.querySelectorAll('.card-loading').forEach(function(e){e.classList.remove('show');});
   currentIndex=-1;
@@ -260,10 +274,9 @@ function playChannel(index){
   showToast('Carregando "'+ch.name+'"...','warn');
   setCardLoading(index, true);
 
-  // Timeout de 12 segundos — se não carregar, avisa
   loadTimer = setTimeout(function(){
     setCardLoading(index, false);
-    showToast('⚠️ Canal demorou demais. Pode estar offline. Tente outro.','err');
+    showToast('⚠️ Canal demorou demais. Pode estar offline.','err');
     document.getElementById('heroDesc').textContent='Este canal parece estar offline.';
   }, 12000);
 
@@ -340,8 +353,13 @@ document.getElementById('searchToggle').onclick=function(){
 };
 document.getElementById('searchInput').addEventListener('input',function(e){
   var q=e.target.value.toLowerCase().trim();
-  channels=!q?allChannels.slice():allChannels.filter(function(c){
-    return c.name.toLowerCase().indexOf(q)!==-1||c.group.toLowerCase().indexOf(q)!==-1;
+  if(!q){
+    filterAndRender();
+    return;
+  }
+  var base = currentTab === 'todos' ? allChannels : allChannels.filter(function(c){return c.group===currentTab;});
+  channels = base.filter(function(c){
+    return c.name.toLowerCase().indexOf(q)!==-1 || c.group.toLowerCase().indexOf(q)!==-1;
   });
   renderRows();
 });
@@ -351,7 +369,10 @@ window.addEventListener('scroll',function(){
 });
 
 window.addEventListener('load',function(){
-  loadPlaylist('verificada');
+  allChannels = CURATED.slice();
+  channels = allChannels.slice();
+  renderRows();
+  showToast(allChannels.length+' canais brasileiros carregados 🇧🇷','ok');
 });
 </script>
 </body>
