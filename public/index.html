@@ -6,6 +6,7 @@
 <title>IPTV Flix</title>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <style>
+/* ... (todo o CSS que já usamos, sem alterações) ... */
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Helvetica Neue',Arial,sans-serif}
 :root{--red:#e50914;--bg:#141414;--card:#181818}
 body{background:var(--bg);color:#fff;min-height:100vh;overflow-x:hidden}
@@ -114,14 +115,11 @@ body{background:var(--bg);color:#fff;min-height:100vh;overflow-x:hidden}
 </section>
 
 <div class="cat-bar" id="catBar">
-<button class="cat-btn active" onclick="loadPlaylist('https://iptv-org.github.io/iptv/countries/br.m3u',this)">🇧🇷 Brasil</button>
-<button class="cat-btn" onclick="loadPlaylist('https://iptv-org.github.io/iptv/index.m3u',this)">🌍 Global</button>
+<button class="cat-btn active" onclick="loadPlaylist('https://iptv-org.github.io/iptv/countries/br.m3u',this)">🇧🇷 Brasil (iptv-org)</button>
+<button class="cat-btn" onclick="loadPlaylist('https://iptv-com.github.io/iptv/lists/brazil.m3u',this)">🇧🇷 Brasil (iptv-com)</button>
 <button class="cat-btn" onclick="loadPlaylist('https://iptv-org.github.io/iptv/categories/news.m3u',this)">📰 Notícias</button>
 <button class="cat-btn" onclick="loadPlaylist('https://iptv-org.github.io/iptv/categories/sports.m3u',this)">⚽ Esportes</button>
 <button class="cat-btn" onclick="loadPlaylist('https://iptv-org.github.io/iptv/categories/movies.m3u',this)">🎬 Filmes</button>
-<button class="cat-btn" onclick="loadPlaylist('https://iptv-org.github.io/iptv/categories/kids.m3u',this)">👶 Infantil</button>
-<button class="cat-btn" onclick="loadPlaylist('https://iptv-org.github.io/iptv/categories/music.m3u',this)">🎵 Música</button>
-<button class="cat-btn" onclick="loadPlaylist('https://iptv-org.github.io/iptv/categories/documentary.m3u',this)">🎥 Docs</button>
 </div>
 
 <div id="content"><div class="empty">👆 Escolha uma categoria para carregar os canais</div></div>
@@ -129,12 +127,10 @@ body{background:var(--bg);color:#fff;min-height:100vh;overflow-x:hidden}
 <div class="toast" id="toast"><span id="toastText">Pronto</span></div>
 
 <script>
-var hls=null,allChannels=[],channels=[],currentIndex=-1;
+var hls=null, allChannels=[], channels=[], currentIndex=-1;
 
 function showToast(m,t){t=t||'ok';var el=document.getElementById('toast');document.getElementById('toastText').textContent=m;el.className='toast '+t+' show';clearTimeout(window._tt);window._tt=setTimeout(function(){el.classList.remove('show');},3500);}
-
 function getInitials(n){if(!n)return'?';var w=n.trim().split(/\s+/);return w.length===1?w[0].substring(0,2).toUpperCase():(w[0][0]+w[1][0]).toUpperCase();}
-
 function escapeHtml(t){var d=document.createElement('div');d.textContent=t||'';return d.innerHTML;}
 
 function parseM3U(text){
@@ -155,12 +151,12 @@ async function loadPlaylist(url,btn){
   if(btn){document.querySelectorAll('.cat-btn').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');}
   var c=document.getElementById('content');
   c.innerHTML='<div class="loader"></div>';
-  showToast('Carregando...','warn');
+  showToast('Carregando playlist...','warn');
   try{
     var r=await fetch('/proxy?url='+encodeURIComponent(url));
-    if(!r.ok)throw new Error('HTTP '+r.status);
+    if(!r.ok) throw new Error('HTTP '+r.status);
     var txt=await r.text();
-    if(txt.trim().startsWith('<'))throw new Error('Não é M3U');
+    if(txt.trim().startsWith('<')) throw new Error('Resposta não é M3U');
     allChannels=parseM3U(txt);
     if(!allChannels.length){c.innerHTML='<div class="empty">Nenhum canal encontrado</div>';return;}
     channels=allChannels.slice();
@@ -168,8 +164,8 @@ async function loadPlaylist(url,btn){
     showToast(allChannels.length+' canais carregados 🎬','ok');
   }catch(e){
     console.error(e);
-    c.innerHTML='<div class="empty">❌ Falha ao carregar. Verifique se a função /proxy está ativa.</div>';
-    showToast('Erro ao carregar','err');
+    c.innerHTML='<div class="empty">❌ Falha ao carregar a playlist. Verifique se o proxy está funcionando.</div>';
+    showToast('Erro ao carregar playlist','err');
   }
 }
 
@@ -245,20 +241,44 @@ function playChannel(index){
   document.getElementById('heroGroup').textContent=ch.group;
   document.getElementById('heroDesc').textContent='Transmissão ao vivo • '+ch.group;
   showToast('Carregando "'+ch.name+'"...','warn');
-  var streamUrl='/proxy?url='+encodeURIComponent(ch.url);
-  var isHls=ch.url.indexOf('.m3u8')!==-1;
-  if(isHls&&Hls.isSupported()){
-    hls=new Hls({enableWorker:true,lowLatencyMode:true});
+  
+  var streamUrl = '/proxy?url='+encodeURIComponent(ch.url);
+  var isHls = ch.url.indexOf('.m3u8')!==-1;
+
+  if(isHls && Hls.isSupported()){
+    hls = new Hls({ enableWorker:true, lowLatencyMode:true });
     hls.loadSource(streamUrl);
     hls.attachMedia(v);
-    hls.on(Hls.Events.MANIFEST_PARSED,function(){
+    hls.on(Hls.Events.MANIFEST_PARSED, function(){
       v.play().then(function(){showToast('▶ '+ch.name,'ok');}).catch(function(){showToast('Clique em Reproduzir','warn');});
     });
-    hls.on(Hls.Events.ERROR,function(e,d){if(d.fatal)showToast('Erro no stream','err');});
-  }else{
-    v.src=streamUrl;v.load();
-    v.play().then(function(){showToast('▶ '+ch.name,'ok');}).catch(function(){showToast('Clique em Reproduzir','warn');});
-    v.onerror=function(){showToast('Erro ao carregar','err');};
+    
+    hls.on(Hls.Events.ERROR, function(event, data) {
+      console.warn("Erro HLS:", data);
+      if (data.fatal) {
+        switch(data.type) {
+          case Hls.ErrorTypes.NETWORK_ERROR:
+            showToast('Erro de rede. Tentando reconectar...', 'warn');
+            hls.startLoad();
+            break;
+          case Hls.ErrorTypes.MEDIA_ERROR:
+            showToast('Erro de mídia. Tentando recuperar...', 'warn');
+            hls.recoverMediaError();
+            break;
+          default:
+            showToast('Não foi possível carregar este canal (ele pode estar offline).', 'err');
+            stopPlayback();
+            break;
+        }
+      }
+    });
+
+  } else {
+    // Fallback para outros formatos ou navegadores sem suporte a HLS.js
+    v.src = streamUrl;
+    v.load();
+    v.play().then(function(){showToast('▶ '+ch.name,'ok');}).catch(function(){showToast('Clique em Reproduzir para iniciar','warn');});
+    v.onerror = function() { showToast('Erro ao carregar o canal.', 'err'); };
   }
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -292,6 +312,7 @@ window.addEventListener('scroll',function(){
   document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>50);
 });
 
+// Carrega a lista do Brasil como padrão
 window.addEventListener('load',function(){
   setTimeout(function(){loadPlaylist('https://iptv-org.github.io/iptv/countries/br.m3u');},400);
 });
