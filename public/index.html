@@ -6,7 +6,6 @@
 <title>IPTV Flix</title>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <style>
-/* ... (todo o CSS que já usamos, sem alterações) ... */
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Helvetica Neue',Arial,sans-serif}
 :root{--red:#e50914;--bg:#141414;--card:#181818}
 body{background:var(--bg);color:#fff;min-height:100vh;overflow-x:hidden}
@@ -14,11 +13,9 @@ body{background:var(--bg);color:#fff;min-height:100vh;overflow-x:hidden}
 .navbar.scrolled{background:var(--bg);box-shadow:0 2px 10px rgba(0,0,0,.5)}
 .logo{font-size:2rem;font-weight:900;color:var(--red);letter-spacing:2px;text-transform:uppercase}
 .nav-menu{display:flex;gap:22px;font-size:.9rem;color:#e5e5e5}
-.nav-menu span{cursor:pointer;transition:color .2s}
-.nav-menu span:hover{color:#b3b3b3}
+.nav-menu span{cursor:pointer}
 .nav-menu span.active{color:#fff;font-weight:500}
 .nav-right{margin-left:auto;display:flex;align-items:center;gap:20px}
-.search-wrap{display:flex;align-items:center}
 .search-wrap input{width:0;opacity:0;padding:6px 8px;background:rgba(0,0,0,.85);border:1px solid rgba(255,255,255,.4);color:#fff;font-size:.85rem;outline:none;transition:all .3s;border-radius:2px}
 .search-wrap.open input{width:240px;opacity:1}
 .search-icon{cursor:pointer;font-size:1.1rem;padding:8px}
@@ -48,7 +45,7 @@ body{background:var(--bg);color:#fff;min-height:100vh;overflow-x:hidden}
 .btn-hero.icon{width:44px;height:44px;border-radius:50%;padding:0;background:rgba(42,42,42,.7);border:2px solid rgba(255,255,255,.7)}
 .cat-bar{margin:0 60px 40px;display:flex;gap:8px;flex-wrap:wrap;position:relative;z-index:100}
 .cat-btn{padding:8px 18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#e5e5e5;border-radius:20px;cursor:pointer;font-size:.8rem;font-weight:500;transition:all .25s;white-space:nowrap;font-family:inherit}
-.cat-btn:hover{background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.4)}
+.cat-btn:hover{background:rgba(255,255,255,.15);color:#fff}
 .cat-btn.active{background:var(--red);border-color:var(--red);color:#fff;font-weight:700}
 .row{position:relative;margin-bottom:42px;z-index:5}
 .row-header{padding:0 60px 10px}
@@ -56,41 +53,43 @@ body{background:var(--bg);color:#fff;min-height:100vh;overflow-x:hidden}
 .row-scroll-wrap{position:relative;padding:0 60px;margin:0 -60px}
 .row-scroll{display:flex;gap:6px;overflow-x:auto;scroll-behavior:smooth;padding:30px 60px;margin:-30px 0;scrollbar-width:none}
 .row-scroll::-webkit-scrollbar{display:none}
-.card{flex:0 0 auto;width:260px;cursor:pointer;border-radius:4px;overflow:hidden;background:var(--card);transition:transform .3s,box-shadow .3s}
+.card{flex:0 0 auto;width:260px;cursor:pointer;border-radius:4px;overflow:hidden;background:var(--card);transition:transform .3s,box-shadow .3s;position:relative}
 .card:hover{transform:scale(1.32) translateY(-12px);z-index:50;box-shadow:0 20px 50px rgba(0,0,0,.9)}
 .card-thumb{width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,#1e1e1e,#2a2a2a);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
 .card-thumb img{width:100%;height:100%;object-fit:contain;padding:22px}
 .card-initials{font-size:2.6rem;font-weight:900;color:rgba(255,255,255,.12);letter-spacing:3px;font-family:'Arial Black',sans-serif}
 .card-live{position:absolute;top:8px;left:8px;background:var(--red);color:#fff;font-size:.6rem;font-weight:800;padding:2px 6px;border-radius:2px;letter-spacing:.8px;z-index:3}
+.card-loading{position:absolute;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:5}
+.card-loading.show{display:flex}
+.card-loading::after{content:'';width:32px;height:32px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .card-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.1) 0%,rgba(0,0,0,.85) 100%);display:flex;align-items:flex-end;justify-content:center;padding-bottom:20px;opacity:0;transition:opacity .3s;z-index:2}
 .card:hover .card-overlay{opacity:1}
 .card-play-btn{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.95);color:#000;display:flex;align-items:center;justify-content:center;font-size:1.4rem;padding-left:4px;box-shadow:0 6px 20px rgba(0,0,0,.6)}
-.scroll-btn{position:absolute;top:30px;bottom:30px;width:55px;background:rgba(20,20,20,.75);border:none;color:#fff;cursor:pointer;font-size:2rem;z-index:20;opacity:0;transition:opacity .25s,background .25s;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+.scroll-btn{position:absolute;top:30px;bottom:30px;width:55px;background:rgba(20,20,20,.75);border:none;color:#fff;cursor:pointer;font-size:2rem;z-index:20;opacity:0;transition:opacity .25s;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
 .row-scroll-wrap:hover .scroll-btn{opacity:1}
 .scroll-btn:hover{background:rgba(20,20,20,.95)}
-.scroll-left{left:0;border-radius:0 4px 4px 0}
-.scroll-right{right:0;border-radius:4px 0 0 4px}
+.scroll-left{left:0}
+.scroll-right{right:0}
 .loader{display:flex;justify-content:center;padding:80px 0}
 .loader::after{content:'';width:46px;height:46px;border:3px solid rgba(229,9,20,.2);border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.empty{text-align:center;padding:80px 20px;color:#737373;font-size:1rem}
-.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);padding:12px 26px;border-radius:4px;font-size:.85rem;font-weight:600;z-index:3000;transition:all .3s;opacity:0;pointer-events:none;box-shadow:0 12px 32px rgba(0,0,0,.7)}
+.empty{text-align:center;padding:80px 20px;color:#737373}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);padding:12px 26px;border-radius:4px;font-size:.85rem;font-weight:600;z-index:3000;transition:all .3s;opacity:0;pointer-events:none;box-shadow:0 12px 32px rgba(0,0,0,.7);max-width:90%}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.ok{background:#1e8449;color:#fff}
 .toast.err{background:var(--red);color:#fff}
 .toast.warn{background:#b7950b;color:#fff}
-@media(max-width:900px){.navbar{padding:0 20px;gap:15px}.nav-menu{display:none}.hero-content{left:20px;max-width:70%}.hero-title{font-size:2.4rem}.cat-bar{margin-left:20px;margin-right:20px}.row-header{padding-left:20px;padding-right:20px}.row-scroll-wrap{padding-left:20px;padding-right:20px;margin-left:-20px;margin-right:-20px}.row-scroll{padding-left:20px;padding-right:20px}.card{width:180px}.scroll-btn{display:none}}
+@media(max-width:900px){.navbar{padding:0 20px}.nav-menu{display:none}.hero-content{left:20px;max-width:70%}.hero-title{font-size:2.4rem}.cat-bar{margin-left:20px;margin-right:20px}.row-header{padding-left:20px;padding-right:20px}.row-scroll-wrap{padding-left:20px;padding-right:20px;margin-left:-20px;margin-right:-20px}.row-scroll{padding-left:20px;padding-right:20px}.card{width:180px}.scroll-btn{display:none}}
 </style>
 </head>
 <body>
 
 <nav class="navbar" id="navbar">
 <div class="logo">IPTV FLIX</div>
-<div class="nav-menu">
-<span class="active">Início</span><span>Séries</span><span>Filmes</span><span>Bombando</span><span>Minha lista</span>
-</div>
+<div class="nav-menu"><span class="active">Início</span><span>Canais</span><span>Filmes</span><span>Notícias</span></div>
 <div class="nav-right">
-<div class="search-wrap" id="searchWrap"><input type="text" id="searchInput" placeholder="Buscar canais..."></div>
+<div class="search-wrap" id="searchWrap"><input type="text" id="searchInput" placeholder="Buscar..."></div>
 <span class="search-icon" id="searchToggle">🔍</span>
 <div class="avatar">B</div>
 </div>
@@ -105,29 +104,27 @@ body{background:var(--bg);color:#fff;min-height:100vh;overflow-x:hidden}
 <div class="hero-badge-row"><span class="live-dot">AO VIVO</span><span id="heroGroup">Selecione um canal</span></div>
 <h1 class="hero-title" id="heroTitle">BEM-VINDO</h1>
 <div class="hero-meta"><span class="match">98% relevante</span><span>2024</span><span class="hero-tag">HD</span><span class="hero-tag">L</span></div>
-<p class="hero-desc" id="heroDesc">Escolha uma categoria abaixo para começar a assistir. Transmissões ao vivo de canais abertos e gratuitos.</p>
+<p class="hero-desc" id="heroDesc">Canais verificados e prontos para assistir. Clique em qualquer um abaixo.</p>
 <div class="hero-actions">
 <button class="btn-hero play" id="btnPlayHero">▶ Reproduzir</button>
-<button class="btn-hero info" id="btnInfoHero">ℹ Mais informações</button>
 <button class="btn-hero icon" id="btnStopHero" title="Parar">⏹</button>
 </div>
 </div>
 </section>
 
 <div class="cat-bar" id="catBar">
-<button class="cat-btn active" onclick="loadPlaylist('https://iptv-org.github.io/iptv/countries/br.m3u',this)">🇧🇷 Brasil (iptv-org)</button>
-<button class="cat-btn" onclick="loadPlaylist('https://iptv-com.github.io/iptv/lists/brazil.m3u',this)">🇧🇷 Brasil (iptv-com)</button>
+<button class="cat-btn active" onclick="loadPlaylist('verificada',this)">✅ Canais Verificados</button>
 <button class="cat-btn" onclick="loadPlaylist('https://iptv-org.github.io/iptv/categories/news.m3u',this)">📰 Notícias</button>
 <button class="cat-btn" onclick="loadPlaylist('https://iptv-org.github.io/iptv/categories/sports.m3u',this)">⚽ Esportes</button>
 <button class="cat-btn" onclick="loadPlaylist('https://iptv-org.github.io/iptv/categories/movies.m3u',this)">🎬 Filmes</button>
 </div>
 
-<div id="content"><div class="empty">👆 Escolha uma categoria para carregar os canais</div></div>
+<div id="content"><div class="empty">Carregando...</div></div>
 
 <div class="toast" id="toast"><span id="toastText">Pronto</span></div>
 
 <script>
-var hls=null, allChannels=[], channels=[], currentIndex=-1;
+var hls=null, allChannels=[], channels=[], currentIndex=-1, loadTimer=null;
 
 function showToast(m,t){t=t||'ok';var el=document.getElementById('toast');document.getElementById('toastText').textContent=m;el.className='toast '+t+' show';clearTimeout(window._tt);window._tt=setTimeout(function(){el.classList.remove('show');},3500);}
 function getInitials(n){if(!n)return'?';var w=n.trim().split(/\s+/);return w.length===1?w[0].substring(0,2).toUpperCase():(w[0][0]+w[1][0]).toUpperCase();}
@@ -150,22 +147,32 @@ function parseM3U(text){
 async function loadPlaylist(url,btn){
   if(btn){document.querySelectorAll('.cat-btn').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');}
   var c=document.getElementById('content');
-  c.innerHTML='<div class="loader"></div>';
-  showToast('Carregando playlist...','warn');
+
+  // Lista verificada (world_ip_tv)
+  if(url==='verificada'){
+    url = 'https://romaxa55.github.io/world_ip_tv/output/index.m3u';
+  }
+
+  c.innerHTML='<div class="empty">⏳ Carregando lista verificada...</div>';
+  showToast('Buscando canais verificados...','warn');
+
   try{
-    var r=await fetch('/proxy?url='+encodeURIComponent(url));
+    var controller = new AbortController();
+    var tid = setTimeout(function(){controller.abort();}, 25000);
+    var r = await fetch('/proxy?url='+encodeURIComponent(url), {signal: controller.signal});
+    clearTimeout(tid);
     if(!r.ok) throw new Error('HTTP '+r.status);
-    var txt=await r.text();
-    if(txt.trim().startsWith('<')) throw new Error('Resposta não é M3U');
-    allChannels=parseM3U(txt);
+    var txt = await r.text();
+    if(txt.trim().startsWith('<')) throw new Error('Não é M3U');
+    allChannels = parseM3U(txt);
     if(!allChannels.length){c.innerHTML='<div class="empty">Nenhum canal encontrado</div>';return;}
-    channels=allChannels.slice();
+    channels = allChannels.slice();
     renderRows();
-    showToast(allChannels.length+' canais carregados 🎬','ok');
+    showToast(allChannels.length+' canais verificados 🎬','ok');
   }catch(e){
     console.error(e);
-    c.innerHTML='<div class="empty">❌ Falha ao carregar a playlist. Verifique se o proxy está funcionando.</div>';
-    showToast('Erro ao carregar playlist','err');
+    c.innerHTML='<div class="empty">❌ Falha ao carregar. Tente novamente.</div>';
+    showToast(e.name==='AbortError'?'Timeout — lista muito grande':'Erro ao carregar','err');
   }
 }
 
@@ -199,17 +206,18 @@ function buildRow(title,items){
 }
 
 function buildCard(ch,idx){
-  var card=document.createElement('div');card.className='card';
+  var card=document.createElement('div');card.className='card';card.dataset.idx=idx;
   card.onclick=function(){playChannel(idx);};
   var thumb=document.createElement('div');thumb.className='card-thumb';
   if(ch.logo){
-    var img=document.createElement('img');img.src=ch.logo;
+    var img=document.createElement('img');img.src=ch.logo;img.loading='lazy';
     img.onerror=function(){img.style.display='none';var i=document.createElement('div');i.className='card-initials';i.textContent=getInitials(ch.name);thumb.appendChild(i);};
     thumb.appendChild(img);
   }else{
     var i=document.createElement('div');i.className='card-initials';i.textContent=getInitials(ch.name);thumb.appendChild(i);
   }
   var live=document.createElement('div');live.className='card-live';live.textContent='AO VIVO';thumb.appendChild(live);
+  var loading=document.createElement('div');loading.className='card-loading';loading.dataset.loading=idx;thumb.appendChild(loading);
   var ov=document.createElement('div');ov.className='card-overlay';
   var pb=document.createElement('div');pb.className='card-play-btn';pb.textContent='▶';
   ov.appendChild(pb);thumb.appendChild(ov);
@@ -219,14 +227,21 @@ function buildCard(ch,idx){
 
 function scrollBy(wrap,amount){wrap.querySelector('.row-scroll').scrollBy({left:amount,behavior:'smooth'});}
 
+function setCardLoading(idx, show){
+  var el = document.querySelector('.card-loading[data-loading="'+idx+'"]');
+  if(el) el.classList.toggle('show', show);
+}
+
 function stopPlayback(){
+  if(loadTimer){clearTimeout(loadTimer);loadTimer=null;}
   if(hls){hls.destroy();hls=null;}
   var v=document.getElementById('video');
   v.pause();v.removeAttribute('src');v.load();v.style.display='none';
   document.getElementById('heroBackdrop').style.display='flex';
   document.getElementById('heroTitle').textContent='BEM-VINDO';
-  document.getElementById('heroDesc').textContent='Escolha uma categoria abaixo para começar a assistir.';
+  document.getElementById('heroDesc').textContent='Canais verificados e prontos para assistir.';
   document.getElementById('heroGroup').textContent='Selecione um canal';
+  document.querySelectorAll('.card-loading').forEach(function(e){e.classList.remove('show');});
   currentIndex=-1;
 }
 
@@ -234,51 +249,78 @@ function playChannel(index){
   if(index<0||index>=channels.length)return;
   var ch=channels[index];currentIndex=index;
   var v=document.getElementById('video');
+  if(loadTimer){clearTimeout(loadTimer);loadTimer=null;}
   if(hls){hls.destroy();hls=null;}
+  document.querySelectorAll('.card-loading').forEach(function(e){e.classList.remove('show');});
   v.pause();v.removeAttribute('src');v.load();v.style.display='block';
   document.getElementById('heroBackdrop').style.display='none';
   document.getElementById('heroTitle').textContent=ch.name;
   document.getElementById('heroGroup').textContent=ch.group;
-  document.getElementById('heroDesc').textContent='Transmissão ao vivo • '+ch.group;
+  document.getElementById('heroDesc').textContent='Conectando...';
   showToast('Carregando "'+ch.name+'"...','warn');
-  
+  setCardLoading(index, true);
+
+  // Timeout de 12 segundos — se não carregar, avisa
+  loadTimer = setTimeout(function(){
+    setCardLoading(index, false);
+    showToast('⚠️ Canal demorou demais. Pode estar offline. Tente outro.','err');
+    document.getElementById('heroDesc').textContent='Este canal parece estar offline.';
+  }, 12000);
+
   var streamUrl = '/proxy?url='+encodeURIComponent(ch.url);
   var isHls = ch.url.indexOf('.m3u8')!==-1;
 
   if(isHls && Hls.isSupported()){
-    hls = new Hls({ enableWorker:true, lowLatencyMode:true });
+    hls = new Hls({
+      enableWorker: true,
+      lowLatencyMode: false,
+      manifestLoadingTimeOut: 8000,
+      manifestLoadingMaxRetry: 1,
+      levelLoadingTimeOut: 8000,
+      fragLoadingTimeOut: 12000
+    });
     hls.loadSource(streamUrl);
     hls.attachMedia(v);
+
     hls.on(Hls.Events.MANIFEST_PARSED, function(){
-      v.play().then(function(){showToast('▶ '+ch.name,'ok');}).catch(function(){showToast('Clique em Reproduzir','warn');});
-    });
-    
-    hls.on(Hls.Events.ERROR, function(event, data) {
-      console.warn("Erro HLS:", data);
-      if (data.fatal) {
-        switch(data.type) {
-          case Hls.ErrorTypes.NETWORK_ERROR:
-            showToast('Erro de rede. Tentando reconectar...', 'warn');
-            hls.startLoad();
-            break;
-          case Hls.ErrorTypes.MEDIA_ERROR:
-            showToast('Erro de mídia. Tentando recuperar...', 'warn');
-            hls.recoverMediaError();
-            break;
-          default:
-            showToast('Não foi possível carregar este canal (ele pode estar offline).', 'err');
-            stopPlayback();
-            break;
-        }
-      }
+      if(loadTimer){clearTimeout(loadTimer);loadTimer=null;}
+      setCardLoading(index, false);
+      v.play().then(function(){
+        showToast('▶ '+ch.name,'ok');
+        document.getElementById('heroDesc').textContent='Assistindo • '+ch.group;
+      }).catch(function(){
+        showToast('Clique em Reproduzir para iniciar','warn');
+      });
     });
 
+    hls.on(Hls.Events.ERROR, function(event, data){
+      if(!data.fatal) return;
+      if(loadTimer){clearTimeout(loadTimer);loadTimer=null;}
+      setCardLoading(index, false);
+      if(data.type === Hls.ErrorTypes.NETWORK_ERROR && data.details === 'manifestLoadError'){
+        showToast('Canal offline. Escolha outro.','err');
+        document.getElementById('heroDesc').textContent='Canal offline.';
+      } else if(data.type === Hls.ErrorTypes.MEDIA_ERROR){
+        showToast('Erro de mídia. Tentando...','warn');
+        hls.recoverMediaError();
+      } else {
+        showToast('Erro ao carregar canal.','err');
+        document.getElementById('heroDesc').textContent='Erro ao carregar.';
+      }
+    });
   } else {
-    // Fallback para outros formatos ou navegadores sem suporte a HLS.js
     v.src = streamUrl;
     v.load();
-    v.play().then(function(){showToast('▶ '+ch.name,'ok');}).catch(function(){showToast('Clique em Reproduzir para iniciar','warn');});
-    v.onerror = function() { showToast('Erro ao carregar o canal.', 'err'); };
+    v.oncanplay = function(){
+      if(loadTimer){clearTimeout(loadTimer);loadTimer=null;}
+      setCardLoading(index, false);
+      v.play().then(function(){showToast('▶ '+ch.name,'ok');}).catch(function(){showToast('Clique em Reproduzir','warn');});
+    };
+    v.onerror = function(){
+      if(loadTimer){clearTimeout(loadTimer);loadTimer=null;}
+      setCardLoading(index, false);
+      showToast('Erro ao carregar canal.','err');
+    };
   }
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -290,10 +332,6 @@ document.getElementById('btnPlayHero').onclick=function(){
   else showToast('Nenhum canal disponível','warn');
 };
 document.getElementById('btnStopHero').onclick=function(){stopPlayback();showToast('Parado','warn');};
-document.getElementById('btnInfoHero').onclick=function(){
-  if(currentIndex>=0)showToast('Canal: '+channels[currentIndex].name,'ok');
-  else showToast('Selecione um canal primeiro','warn');
-};
 
 document.getElementById('searchToggle').onclick=function(){
   var w=document.getElementById('searchWrap');
@@ -312,9 +350,8 @@ window.addEventListener('scroll',function(){
   document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>50);
 });
 
-// Carrega a lista do Brasil como padrão
 window.addEventListener('load',function(){
-  setTimeout(function(){loadPlaylist('https://iptv-org.github.io/iptv/countries/br.m3u');},400);
+  loadPlaylist('verificada');
 });
 </script>
 </body>
