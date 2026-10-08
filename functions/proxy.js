@@ -22,13 +22,23 @@ export async function onRequest(context) {
     const target = new URL(targetUrl);
     const proxyBase = url.origin + "/proxy?url=";
 
+    // Adiciona um timeout para não travar em streams lentos
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 segundos
+
     const response = await fetch(targetUrl, {
+      signal: controller.signal,
       headers: {
         "User-Agent": request.headers.get("User-Agent") || "Mozilla/5.0",
         "Referer": target.origin,
         "Origin": target.origin,
       },
     });
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
 
     const contentType = response.headers.get("content-type") || "";
     const isM3U8 = targetUrl.includes(".m3u8") || contentType.includes("mpegurl");
@@ -54,15 +64,21 @@ export async function onRequest(context) {
       const nr = new Response(rewritten.join("\n"), { status: 200 });
       Object.keys(corsHeaders).forEach((k) => nr.headers.set(k, corsHeaders[k]));
       nr.headers.set("Content-Type", "application/vnd.apple.mpegurl");
+      // Evita cache do Cloudflare, mas permite cache curto do navegador
+      nr.headers.set("Cache-Control", "public, max-age=30");
       return nr;
     }
 
     const nr = new Response(response.body, { status: response.status });
     Object.keys(corsHeaders).forEach((k) => nr.headers.set(k, corsHeaders[k]));
     if (contentType) nr.headers.set("Content-Type", contentType);
+    // Cache para os segmentos de vídeo (o que mais ajuda a performance)
+    nr.headers.set("Cache-Control", "public, max-age=3600");
     return nr;
 
   } catch (err) {
-    return new Response("Erro no proxy: " + err.message, { status: 500, headers: corsHeaders });
+    console.error("Erro no proxy:", err);
+    const msg = err.name === 'AbortError' ? 'Timeout ao conectar ao stream.' : 'Erro no proxy: ' + err.message;
+    return new Response(msg, { status: 502, headers: corsHeaders });
   }
 }
